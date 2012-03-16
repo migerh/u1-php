@@ -91,6 +91,7 @@ class U1_OAuth_PHP extends U1_OAuth {
                         'body'       => null,
                     );
                     break;
+                case 401 :
                 case 403 :
                     throw new U1_Exception('Forbidden. This could mean a bad OAuth request, or a file or folder already existing at the target location.', 403);
                 case 404 : 
