@@ -1,5 +1,7 @@
 <?php
 
+require_once("../src/OAuth-PHP.php");
+
 /**
  *
  * U1 PHP auth example
@@ -17,7 +19,6 @@ $consumerName = 'U1 PHP Example';
 $callbackURL = 'http://google.com';
 
 $oauth = new U1_OAuth_PHP($consumerName);
-$dropbox = new U1($oauth);
 
 // We need to start a session
 session_start();
@@ -67,6 +68,4 @@ switch($state) {
         print_r($_SESSION['oauth_tokens']);
         $oauth->setToken($_SESSION['oauth_tokens']);
         break;
-    }
-
 }
