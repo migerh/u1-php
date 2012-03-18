@@ -1,9 +1,11 @@
 <?php
 
 /**
- * Dropbox OAuth
+ * U1 OAuth
  * 
- * @package Dropbox 
+ * @package U1 PHP
+ *
+ * From:
  * @copyright Copyright (C) 2010 Rooftop Solutions. All rights reserved.
  * @author Evert Pot (http://www.rooftopsolutions.nl/) 
  * @license http://code.google.com/p/dropbox-php/wiki/License MIT
@@ -19,14 +21,6 @@
 abstract class U1_OAuth {
 
     /**
-     * After a user has authorized access, dropbox can redirect the user back
-     * to this url.
-     * 
-     * @var string
-     */
-    public $authorizeCallbackUrl = null; 
-   
-    /**
      * Uri used to fetch request tokens 
      * 
      * @var string
@@ -41,17 +35,17 @@ abstract class U1_OAuth {
     const URI_AUTHORIZE = 'https://one.ubuntu.com/oauth/authorize/';
 
     /**
-     * Description of the service that requests the users authentication.
-     * @var string
-     */
-     protected $consumerName = '';
-
-    /**
      * Uri used to 
      * 
      * @var string
      */
     const URI_ACCESS_TOKEN = 'https://one.ubuntu.com/oauth/access/';
+
+    /**
+     * Description of the service that requests the users authentication.
+     * @var string
+     */
+    protected $consumerName = '';
 
     /**
      * An OAuth request token. 
@@ -88,7 +82,6 @@ abstract class U1_OAuth {
      * @return void
      */
     public function setToken($token, $token_secret = null) {
-
         if (is_array($token)) {
             $this->oauth_token = $token['token'];
             $this->oauth_token_secret = $token['token_secret'];
@@ -107,10 +100,9 @@ abstract class U1_OAuth {
      * @return array 
      */
     public function getToken() {
-
         return array(
             'token' => $this->oauth_token,
-            'token_secret' => $this->oauth_token_secret,
+            'token_secret' => $this->oauth_token_secret
         );
 
     }
@@ -118,15 +110,13 @@ abstract class U1_OAuth {
     /**
      * Returns the authorization url
      * 
-     * @param string $callBack Specify a callback url to automatically redirect the user back 
      * @return string 
      */
-    public function getAuthorizeUrl($callBack = null) {
-        
+    public function getAuthorizeUrl() {
         // Building the redirect uri
         $token = $this->getToken();
         $uri = self::URI_AUTHORIZE . '?description=' . rawurlencode($this->consumerName) . '&oauth_token=' . $token['token'];
-        if ($callBack) $uri.='&oauth_callback=' . $callBack;
+
         return $uri;
     }
 
@@ -144,6 +134,8 @@ abstract class U1_OAuth {
     /**
      * Requests the OAuth request token.
      * 
+     * @param string $callBack Specify a callback url to automatically redirect the user back 
+     *
      * @return array 
      */
     abstract public function getRequestToken($callback); 
@@ -154,5 +146,4 @@ abstract class U1_OAuth {
      * @return array
      */
     abstract public function getAccessToken($verifier); 
-
 }

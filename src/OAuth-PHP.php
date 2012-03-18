@@ -1,9 +1,11 @@
 <?php
 
 /**
- * Dropbox OAuth
+ * Ubuntu One OAuth PHP
  * 
- * @package Dropbox 
+ * @package U1 PHP
+ *
+ * From:
  * @copyright Copyright (C) 2010 Rooftop Solutions. All rights reserved.
  * @author Evert Pot (http://www.rooftopsolutions.nl/) 
  * @license http://code.google.com/p/dropbox-php/wiki/License MIT
@@ -13,7 +15,7 @@ require_once("OAuth.php");
 require_once("Exception.php");
 
 /**
- * This class is used to sign all requests to dropbox.
+ * This class is used to sign all requests to ubuntu one.
  *
  * This specific class uses the PHP OAuth extension
  */
@@ -29,18 +31,17 @@ class U1_OAuth_PHP extends U1_OAuth {
     /**
      * Constructor
      * 
+     * @param string $consumerName
      * @param string $consumerKey 
      * @param string $consumerSecret 
      */
     public function __construct($consumerName, $consumerKey = "ubuntuone", $consumerSecret = "hammertime") {
-
         if (!class_exists('OAuth')) 
             throw new U1_Exception('The OAuth class could not be found! Did you install and enable the oauth extension?', 0);
 
         $this->OAuth = new OAuth($consumerKey, $consumerSecret,OAUTH_SIG_METHOD_HMACSHA1,OAUTH_AUTH_TYPE_URI);
         $this->OAuth->enableDebug();
-	$this->consumerName = $consumerName;
-
+        $this->consumerName = $consumerName;
     }
 
     /**
@@ -54,12 +55,10 @@ class U1_OAuth_PHP extends U1_OAuth {
      * @return void
      */
     public function setToken($token, $token_secret = null) {
-
         parent::setToken($token,$token_secret);
         $this->OAuth->setToken($this->oauth_token, $this->oauth_token_secret);
 
     }
-
 
     /**
      * Fetches a secured oauth url and returns the response body. 
@@ -93,11 +92,11 @@ class U1_OAuth_PHP extends U1_OAuth {
                     break;
                 case 401 :
                 case 403 :
-                    throw new U1_Exception('Forbidden. This could mean a bad OAuth request, or a file or folder already existing at the target location.', 403);
+                    throw new U1_Exception('Forbidden. This could mean a bad OAuth request, or invalid access tokens were used.', 403);
                 case 404 : 
                     throw new U1_Exception('Resource at uri: ' . $uri . ' could not be found', 404);
                 case 507 : 
-                    throw new U1_Exception('This dropbox is full', 509);
+                    throw new U1_Exception('Quota exceeded', 509);
                 default:
                     // rethrowing
                     throw new U1_Exception('Unknown error: ' . $e->getMessage(), 0, $e);
@@ -110,32 +109,31 @@ class U1_OAuth_PHP extends U1_OAuth {
     /**
      * Requests the OAuth request token.
      *
+     * @param string $callback
+     *
      * @return void 
      */
     public function getRequestToken($callback) {
-        
         try {
             $tokens = $this->OAuth->getRequestToken(self::URI_REQUEST_TOKEN . "?oauth_callback=" . $callback);
             $this->setToken($tokens['oauth_token'], $tokens['oauth_token_secret']);
             return $this->getToken();
-
         } catch (OAuthException $e) {
             throw new U1_Exception('We were unable to fetch request tokens. This likely means that your consumer key and/or secret are incorrect.',0,$e);
         }
-
     }
-
 
     /**
      * Requests the OAuth access tokens.
      *
      * This method requires the 'unauthorized' request tokens
      * and, if successful will set the authorized request tokens.
+     *
+     * @param string $verifier
      * 
      * @return void 
      */
     public function getAccessToken($verifier) {
-
         try {
             $uri = self::URI_ACCESS_TOKEN . "?oauth_verifier=".$verifier;
             $tokens = $this->OAuth->getAccessToken($uri);
@@ -144,8 +142,5 @@ class U1_OAuth_PHP extends U1_OAuth {
         } catch (OAuthException $e) {
             throw new U1_Exception('We were unable to fetch access tokens. This likely means that the authentication has not been started properly.',0,$e);
         }
-
     }
-
-
 }
