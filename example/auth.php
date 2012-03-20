@@ -33,11 +33,12 @@ if (isset($_SESSION['state'])) {
     $state = 1;
 }
 
-echo "<a href=\"auth.php?restart=1\">Restart authentication process</a><br /><br />";
-
 if (isset($_REQUEST['restart'])) {
-    $state = 1;
+    $_SESSION['state'] = 1;
+    header('Location: auth.php');
 }
+
+echo "<a href=\"auth.php?restart=1\">Restart authentication process</a><br /><br />";
 
 switch ($state) {
 
@@ -50,7 +51,7 @@ switch ($state) {
         echo "Request token: " . $tokens['token'] . "<br />Secret: " . $tokens['token_secret'] . "</p>";
 
         $url = $oauth->getAuthorizeUrl();
-        echo "<p>Step 2: You must now redirect the user to <a href=\"" . $url . "\">". $url . "</a>.<br />";
+        echo "<p>Step 2: You must now redirect the user to <a href=\"" . $url . "\" target=\"_blank\">". $url . "</a>.<br />";
         echo "After the authentication, Ubuntu One redirects you to the callback url provided by you.";
         echo "Please copy the oauth_verifier parameter value and paste it into the input box which appears";
         echo "after reloading this page.</p>";
